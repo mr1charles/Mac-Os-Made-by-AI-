@@ -1,0 +1,39 @@
+.window {
+  position: absolute;
+  min-width: 320px;
+  min-height: 220px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 20px 40px rgba(9, 12, 24, 0.35);
+  animation: popIn .2s ease;
+}
+@keyframes popIn { from { transform: scale(.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.window.minimized { display: none; }
+.window.maximized {
+  top: 4px !important;
+  left: 4px !important;
+  width: calc(100% - 8px) !important;
+  height: calc(100% - 8px) !important;
+}
+
+.window-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: move;
+}
+.traffic { display: flex; gap: 8px; }
+.traffic button {
+  width: 12px; height: 12px; border: none; border-radius: 50%; cursor: pointer;
+}
+.close { background: #ff5f56; }
+.min { background: #ffbd2e; }
+.max { background: #27c93f; }
+.window-title { font-weight: 700; }
+.window-body { height: calc(100% - 40px); padding: 10px; overflow: auto; }
+.window iframe { width: 100%; height: 100%; border: 0; border-radius: 10px; background: #fff; }

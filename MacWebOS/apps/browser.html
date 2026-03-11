@@ -1,0 +1,8 @@
+<!doctype html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web Browser</title>
+<style>body{margin:0;font-family:system-ui;background:#f5f7fb}.bar{display:flex;gap:8px;padding:10px;background:#dfe7f7}.bar input{flex:1;padding:8px;border-radius:8px;border:1px solid #c5d2eb}.view{padding:14px}.card{background:#fff;border-radius:10px;padding:12px;box-shadow:0 8px 20px rgba(0,0,0,.08)}</style>
+</head><body>
+<div class="bar"><input id="url" placeholder="Enter URL like https://example.com"><button id="go">Go</button></div>
+<div class="view"><div id="status" class="card">Offline-safe browser app. External browsing may be blocked by iframe policies; use this as a local preview hub.</div></div>
+<script>go.onclick=()=>{status.textContent='Requested: '+url.value+' (display is sandboxed in local mode).';};</script>
+</body></html>

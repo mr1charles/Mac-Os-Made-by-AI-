@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Finder</title>
+<style>
+body{margin:0;font-family:-apple-system,system-ui;background:#eef2f8}
+.layout{display:grid;grid-template-columns:200px 1fr;height:100vh}
+aside{background:#dfe6f3;padding:12px;border-right:1px solid #c9d4ea}main{padding:12px}
+.path{background:#fff;padding:8px 10px;border-radius:9px;margin-bottom:10px} .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.item{background:#fff;border-radius:10px;padding:12px;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.07)}
+.toolbar{display:flex;gap:8px;margin-bottom:10px}button,input{border:1px solid #ccd5ea;border-radius:9px;padding:8px 10px}
+</style></head><body>
+<div class="layout"><aside><h3>Favorites</h3><ul><li>Desktop</li><li>Documents</li><li>Downloads</li><li>Music</li></ul></aside>
+<main><div class="toolbar"><input id="q" placeholder="Search files" style="flex:1"><button id="toggle">List</button></div><div class="path">Macintosh HD / Users / Guest / Desktop</div><section id="content" class="grid"></section></main></div>
+<script>
+const files=['Projects','Screenshots','Ideas.txt','Budget.xlsx','Vacation.mp4','Mix.mp3']; let list=false;
+function render(){const qq=q.value.toLowerCase(); content.className=list?'':'grid'; content.innerHTML=files.filter(f=>f.toLowerCase().includes(qq)).map(f=>`<article class='item' draggable='true'>${f.includes('.')?'📄':'📁'} ${f}</article>`).join('');
+content.querySelectorAll('.item').forEach(el=>{el.ondblclick=()=>alert('Opened '+el.textContent.trim()); el.ondragstart=(e)=>e.dataTransfer.setData('text/plain',el.textContent.trim());});}
+q.oninput=render; toggle.onclick=()=>{list=!list; toggle.textContent=list?'Grid':'List'; render();}; render();
+</script>
+</body></html>

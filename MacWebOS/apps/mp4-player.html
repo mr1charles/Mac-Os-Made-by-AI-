@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VideoHub</title>
+  <style>
+    :root { --bg:#0f0f0f; --panel:#1a1a1a; --text:#f1f1f1; --muted:#a6a6a6; --accent:#ff0033; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); }
+    .layout { display:grid; grid-template-columns: minmax(420px,1.6fr) 1fr; gap:14px; height:100vh; padding:12px; }
+    .player, .library { background:var(--panel); border-radius:14px; padding:12px; }
+    .top { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+    input, select, button { border:none; border-radius:10px; padding:8px 10px; }
+    input, select { background:#222; color:#fff; }
+    button { background:var(--accent); color:#fff; cursor:pointer; }
+    #video { width:100%; max-height:58vh; background:#000; border-radius:12px; }
+    .controls { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:8px; }
+    .controls label { display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--muted); }
+    .thumbs { margin-top:10px; display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; overflow:auto; max-height:calc(100vh - 82px); }
+    .card { background:#222; border-radius:10px; padding:8px; cursor:pointer; }
+    .thumb { height:84px; border-radius:8px; background:linear-gradient(135deg,#313131,#111); display:grid; place-items:center; color:#fff; }
+    .meta { margin-top:6px; font-size:12px; color:var(--muted); }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <section class="player">
+    <div class="top">
+      <input id="search" placeholder="Search videos" style="flex:1" />
+      <select id="category"><option>All</option><option>Tutorial</option><option>Music</option><option>Design</option></select>
+      <label style="background:#222;color:#fff;padding:8px 10px;border-radius:10px;cursor:pointer;">Upload<input id="upload" type="file" accept="video/*" hidden></label>
+    </div>
+    <video id="video" controls></video>
+    <div class="controls">
+      <label>Speed<select id="speed"><option>0.5</option><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option><option>2</option></select></label>
+      <label>Volume<input id="volume" type="range" min="0" max="1" step="0.01" value="1"></label>
+      <label>Seek<input id="seek" type="range" min="0" max="100" value="0"></label>
+      <button id="fullscreen">Fullscreen</button>
+    </div>
+  </section>
+  <aside class="library">
+    <h3 style="margin:4px 0 8px 0">Recommended</h3>
+    <div id="grid" class="thumbs"></div>
+  </aside>
+</div>
+<script>
+  const video = document.getElementById('video');
+  const grid = document.getElementById('grid');
+  const db = [
+    {title:'Motion UI Basics',category:'Design'},
+    {title:'LoFi Coding Session',category:'Music'},
+    {title:'JavaScript Drag & Drop',category:'Tutorial'},
+    {title:'CSS Glassmorphism',category:'Design'},
+    {title:'Productivity Sounds',category:'Music'}
+  ];
+  let localVideos = [];
+
+  function render() {
+    const q = search.value.toLowerCase();
+    const c = category.value;
+    grid.innerHTML = [...localVideos, ...db]
+      .filter(v => v.title.toLowerCase().includes(q) && (c==='All'||v.category===c))
+      .map((v,i)=>`<article class="card" data-i="${i}"><div class="thumb">▶</div><div>${v.title}</div><div class="meta">${v.category||'Local file'}</div></article>`).join('');
+  }
+
+  grid.onclick = (e) => {
+    const card = e.target.closest('.card'); if (!card) return;
+    const item = [...localVideos, ...db][Number(card.dataset.i)];
+    if (item.url) { video.src = item.url; video.play(); }
+    else alert('Demo entry. Upload a local file to play real video.');
+  };
+
+  upload.onchange = (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const url = URL.createObjectURL(f);
+    localVideos.unshift({ title:f.name, url, category:'Local' });
+    video.src = url;
+    video.play();
+    render();
+  };
+
+  speed.onchange = () => video.playbackRate = Number(speed.value);
+  volume.oninput = () => video.volume = Number(volume.value);
+  seek.oninput = () => { if (video.duration) video.currentTime = (seek.value/100)*video.duration; };
+  video.ontimeupdate = () => { if (video.duration) seek.value = (video.currentTime/video.duration)*100; };
+  fullscreen.onclick = () => video.requestFullscreen?.();
+  search.oninput = render; category.onchange = render;
+
+  document.body.ondragover = (e) => e.preventDefault();
+  document.body.ondrop = (e) => {
+    e.preventDefault();
+    const file = [...e.dataTransfer.files].find(f=>f.type.startsWith('video/'));
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    localVideos.unshift({ title:file.name, url, category:'Local' });
+    video.src = url; video.play(); render();
+  };
+  render();
+</script>
+</body>
+</html>
