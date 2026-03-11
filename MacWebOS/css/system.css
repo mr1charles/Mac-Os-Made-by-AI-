@@ -1,0 +1,117 @@
+:root {
+  --bg: #e8edf8;
+  --text: #152038;
+  --glass: rgba(255, 255, 255, 0.4);
+  --border: rgba(255, 255, 255, 0.55);
+  --shadow: 0 16px 40px rgba(17, 28, 50, 0.2);
+  --dock-height: 78px;
+}
+
+.dark-mode {
+  --bg: #101522;
+  --text: #ecf1ff;
+  --glass: rgba(17, 24, 39, 0.55);
+  --border: rgba(255, 255, 255, 0.2);
+  --shadow: 0 16px 45px rgba(0, 0, 0, 0.45);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+}
+
+.desktop {
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(22px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.menu-bar {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  right: 12px;
+  z-index: 80;
+  border-radius: 12px;
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.menu-left, .menu-right { display: flex; align-items: center; gap: 8px; }
+.menu-item, .menu-icon, .menu-apple {
+  border: none; background: transparent; color: inherit; cursor: pointer;
+  border-radius: 8px; padding: 6px 8px;
+}
+.menu-app-name { font-weight: 700; margin: 0 4px; }
+#menuClock { font-weight: 600; min-width: 80px; text-align: right; }
+
+.desktop-area { position: absolute; inset: 52px 0 var(--dock-height) 0; overflow: hidden; }
+.desktop-icons { position: absolute; top: 10px; right: 18px; display: grid; gap: 14px; }
+.desktop-icon {
+  width: 84px; text-align: center; cursor: pointer; color: white; text-shadow: 0 2px 7px #000;
+}
+.desktop-icon img { width: 50px; height: 50px; }
+.window-layer, .widget-layer { position: absolute; inset: 0; }
+
+.dock {
+  position: absolute;
+  left: 50%; transform: translateX(-50%);
+  bottom: 10px; z-index: 100;
+  height: var(--dock-height);
+  border-radius: 20px;
+  display: flex; align-items: end; gap: 10px;
+  padding: 10px 14px;
+}
+.dock-app {
+  width: 52px; height: 52px; border-radius: 14px; border: none;
+  background: rgba(255,255,255,.65); cursor: pointer; position: relative;
+  transition: transform .16s ease;
+}
+.dock-app:hover { transform: translateY(-8px) scale(1.16); }
+.dock-app.running::after {
+  content: ""; position: absolute; width: 7px; height: 7px; border-radius: 50%;
+  background: #2f98ff; bottom: -9px; left: 50%; transform: translateX(-50%);
+}
+
+.side-panel {
+  position: absolute; top: 56px; right: 14px; width: 300px; z-index: 120;
+  border-radius: 14px; padding: 14px; transition: transform .22s ease, opacity .22s ease;
+}
+.side-panel.hidden { transform: translateX(120%); opacity: 0; pointer-events: none; }
+.toggle-row { display: flex; gap: 8px; margin: 12px 0; }
+.toggle, .panel-head button {
+  border: none; border-radius: 10px; padding: 8px 10px; cursor: pointer;
+  background: rgba(255,255,255,.6);
+}
+.toggle.active { outline: 2px solid #2f98ff; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; }
+#notificationList { margin: 0; padding-left: 18px; max-height: 300px; overflow: auto; }
+
+.context-menu {
+  position: absolute; z-index: 140; list-style: none; margin: 0; padding: 6px;
+  width: 170px; border-radius: 10px; background: rgba(22, 30, 48, 0.9); color: #f0f4ff;
+}
+.context-menu li { padding: 8px 10px; border-radius: 7px; cursor: pointer; }
+.context-menu li:hover { background: rgba(255,255,255,.2); }
+.hidden { display: none; }
+
+.now-playing {
+  position: absolute; left: 16px; right: 16px; bottom: calc(var(--dock-height) + 16px);
+  z-index: 95; padding: 10px 14px; border-radius: 14px;
+  background: var(--glass); backdrop-filter: blur(18px); border: 1px solid var(--border);
+}
