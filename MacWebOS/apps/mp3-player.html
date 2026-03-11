@@ -8,18 +8,15 @@
     :root{--bg:#121212;--panel:#181818;--panel2:#242424;--text:#fff;--muted:#b3b3b3;--green:#1db954}
     *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
     .app{display:grid;grid-template-columns:260px 1fr;grid-template-rows:1fr 88px;height:100vh}
-    .sidebar{background:#000;padding:12px;overflow:auto}
-    .main{padding:14px;overflow:auto;background:linear-gradient(#2a2a2a,#121212 220px)}
+    .sidebar{background:#000;padding:12px;overflow:auto}.main{padding:14px;overflow:auto;background:linear-gradient(#2a2a2a,#121212 220px)}
     .now{grid-column:1/3;background:var(--panel);border-top:1px solid #333;padding:10px 14px;display:grid;grid-template-columns:220px 1fr 220px;gap:12px;align-items:center}
     input,button{border:none;border-radius:9px;padding:8px 10px} input{background:var(--panel2);color:#fff;width:100%}
     button{background:var(--panel2);color:#fff;cursor:pointer}.primary{background:var(--green);color:#000;font-weight:700}
     .track{padding:10px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;justify-content:space-between;cursor:pointer;margin-top:8px}
     .track:hover{background:rgba(255,255,255,.12)}
-    .hero{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:end}
-    .cover{height:200px;border-radius:12px;background:linear-gradient(135deg,#1db954,#125f2e);display:grid;place-items:center;font-size:42px}
+    .hero{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:end}.cover{height:200px;border-radius:12px;background:linear-gradient(135deg,#1db954,#125f2e);display:grid;place-items:center;font-size:42px}
     .mini{color:var(--muted);font-size:12px}.queue{margin-top:14px}
     canvas{width:100%;height:56px;background:#101010;border-radius:8px}
-    .controls{display:flex;justify-content:center;align-items:center;gap:8px}.seek{width:100%}
   </style>
 </head>
 <body>
@@ -37,73 +34,139 @@
         <div class="mini">ARTIST PAGE</div>
         <h1 id="artist">Various Artists</h1>
         <p id="song" class="mini">Choose a track from the playlist</p>
-        <div class="controls">
+        <div style="display:flex;gap:8px">
           <button id="shuffle">Shuffle</button><button id="prev">⏮</button><button id="play" class="primary">▶</button><button id="next">⏭</button><button id="repeat">Repeat</button>
         </div>
       </div>
     </div>
     <section class="queue">
       <h3>Play Queue</h3>
-      <div id="queue"></div>
+      <div id="queueList"></div>
     </section>
   </main>
   <footer class="now">
     <div><strong id="npTitle">Nothing playing</strong><div id="npArtist" class="mini">—</div></div>
-    <div><input id="seek" class="seek" type="range" min="0" max="100" value="0"><canvas id="viz" width="560" height="56"></canvas></div>
+    <div><input id="seek" type="range" min="0" max="100" value="0"><canvas id="viz" width="560" height="56"></canvas></div>
     <div><label class="mini">Volume<input id="volume" type="range" min="0" max="1" step="0.01" value="1"></label></div>
   </footer>
 </div>
 <audio id="audio"></audio>
 <script>
-  const tracks=[
-    {title:'Neon Nights',artist:'Astra'},
-    {title:'Ocean Pulse',artist:'Lunar Bay'},
-    {title:'Midnight Run',artist:'Vektor'}
+  const $ = (id) => document.getElementById(id);
+  const el = {
+    search: $('search'), picker: $('picker'), playlist: $('playlist'), queueList: $('queueList'),
+    artist: $('artist'), song: $('song'), npTitle: $('npTitle'), npArtist: $('npArtist'),
+    play: $('play'), prev: $('prev'), next: $('next'), shuffle: $('shuffle'), repeat: $('repeat'),
+    seek: $('seek'), volume: $('volume'), viz: $('viz'), audio: $('audio')
+  };
+
+  const starter = [
+    { title: 'Neon Nights', artist: 'Astra' },
+    { title: 'Ocean Pulse', artist: 'Lunar Bay' },
+    { title: 'Midnight Run', artist: 'Vektor' }
   ];
-  let library=[...tracks], queue=[...tracks], index=-1, repeatOn=false;
-  const audio=document.getElementById('audio');
 
-  function render(list=library){
-    playlist.innerHTML=list.map((t,i)=>`<div class='track' data-i='${library.indexOf(t)}'><span>${t.title}</span><small>${t.artist}</small></div>`).join('');
-    queueEl();
-  }
-  function queueEl(){ queue.innerHTML = queue.map((t,i)=>`<div class='track' data-q='${i}'><span>${i+1}. ${t.title}</span><small>${t.artist}</small></div>`).join(''); }
-  function load(i){
-    index=i; const t=library[i]; if(!t) return;
-    song.textContent=t.title; artist.textContent=t.artist; npTitle.textContent=t.title; npArtist.textContent=t.artist;
-    if(t.url){ audio.src=t.url; audio.play(); play.textContent='⏸'; }
+  let library = [...starter];
+  let queue = [...starter];
+  let index = -1;
+  let repeatOn = false;
+
+  function renderPlaylist(list = library) {
+    el.playlist.innerHTML = list
+      .map((t) => `<div class='track' data-i='${library.indexOf(t)}'><span>${t.title}</span><small>${t.artist}</small></div>`)
+      .join('');
   }
 
-  playlist.onclick=(e)=>{const row=e.target.closest('.track'); if(row) load(Number(row.dataset.i)); };
-  queue.onclick=(e)=>{const row=e.target.closest('.track'); if(row){ const t=queue[Number(row.dataset.q)]; load(library.indexOf(t)); }};
-  search.oninput=()=>render(library.filter(t=>`${t.title} ${t.artist}`.toLowerCase().includes(search.value.toLowerCase())));
+  function renderQueue() {
+    el.queueList.innerHTML = queue
+      .map((t, i) => `<div class='track' data-q='${i}'><span>${i + 1}. ${t.title}</span><small>${t.artist}</small></div>`)
+      .join('');
+  }
 
-  picker.onchange=(e)=>{
-    [...e.target.files].forEach(f=>library.push({title:f.name.replace(/\.[^.]+$/,''),artist:'Local File',url:URL.createObjectURL(f)}));
-    queue=[...library]; render();
+  function loadTrack(i) {
+    const track = library[i];
+    if (!track) return;
+    index = i;
+    el.song.textContent = track.title;
+    el.artist.textContent = track.artist;
+    el.npTitle.textContent = track.title;
+    el.npArtist.textContent = track.artist;
+    if (track.url) {
+      el.audio.src = track.url;
+      el.audio.play();
+      el.play.textContent = '⏸';
+    }
+  }
+
+  el.playlist.onclick = (e) => {
+    const row = e.target.closest('.track');
+    if (row) loadTrack(Number(row.dataset.i));
   };
 
-  play.onclick=()=>{
-    if(index<0){load(0); return;}
-    if(audio.paused){audio.play();play.textContent='⏸';}else{audio.pause();play.textContent='▶';}
+  el.queueList.onclick = (e) => {
+    const row = e.target.closest('.track');
+    if (!row) return;
+    const track = queue[Number(row.dataset.q)];
+    loadTrack(library.indexOf(track));
   };
-  next.onclick=()=>load((index+1)%library.length);
-  prev.onclick=()=>load((index-1+library.length)%library.length);
-  shuffle.onclick=()=>load(Math.floor(Math.random()*library.length));
-  repeat.onclick=()=>{repeatOn=!repeatOn; repeat.style.background=repeatOn?'#1db954':'#242424';};
 
-  audio.onended=()=> repeatOn ? load(index) : next.click();
-  audio.ontimeupdate=()=>{ if(audio.duration) seek.value=(audio.currentTime/audio.duration)*100; };
-  seek.oninput=()=>{ if(audio.duration) audio.currentTime=(seek.value/100)*audio.duration; };
-  volume.oninput=()=> audio.volume=Number(volume.value);
+  el.search.oninput = () => {
+    const q = el.search.value.toLowerCase();
+    renderPlaylist(library.filter((t) => `${t.title} ${t.artist}`.toLowerCase().includes(q)));
+  };
 
-  const ctx=viz.getContext('2d');
-  (function loop(){
-    ctx.clearRect(0,0,viz.width,viz.height);
-    for(let i=0;i<38;i++){ const h=6+Math.random()*45; ctx.fillStyle='#1db954'; ctx.fillRect(i*15,56-h,9,h); }
-    requestAnimationFrame(loop);
-  })();
-  render();
+  el.picker.onchange = (e) => {
+    [...e.target.files].forEach((f) => library.push({
+      title: f.name.replace(/\.[^.]+$/, ''), artist: 'Local File', url: URL.createObjectURL(f)
+    }));
+    queue = [...library];
+    renderPlaylist();
+    renderQueue();
+  };
+
+  el.play.onclick = () => {
+    if (index < 0) return loadTrack(0);
+    if (el.audio.paused) {
+      el.audio.play();
+      el.play.textContent = '⏸';
+    } else {
+      el.audio.pause();
+      el.play.textContent = '▶';
+    }
+  };
+  el.next.onclick = () => loadTrack((index + 1 + library.length) % library.length);
+  el.prev.onclick = () => loadTrack((index - 1 + library.length) % library.length);
+  el.shuffle.onclick = () => loadTrack(Math.floor(Math.random() * library.length));
+  el.repeat.onclick = () => {
+    repeatOn = !repeatOn;
+    el.repeat.style.background = repeatOn ? '#1db954' : '#242424';
+  };
+
+  el.audio.onended = () => (repeatOn ? loadTrack(index) : el.next.click());
+  el.audio.ontimeupdate = () => {
+    if (el.audio.duration) el.seek.value = String((el.audio.currentTime / el.audio.duration) * 100);
+  };
+  el.seek.oninput = () => {
+    if (el.audio.duration) el.audio.currentTime = (Number(el.seek.value) / 100) * el.audio.duration;
+  };
+  el.volume.oninput = () => {
+    el.audio.volume = Number(el.volume.value);
+  };
+
+  const ctx = el.viz.getContext('2d');
+  function drawViz() {
+    ctx.clearRect(0, 0, el.viz.width, el.viz.height);
+    for (let i = 0; i < 38; i++) {
+      const h = 6 + Math.random() * 45;
+      ctx.fillStyle = '#1db954';
+      ctx.fillRect(i * 15, 56 - h, 9, h);
+    }
+    requestAnimationFrame(drawViz);
+  }
+
+  renderPlaylist();
+  renderQueue();
+  drawViz();
 </script>
 </body>
 </html>
