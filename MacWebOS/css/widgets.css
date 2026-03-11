@@ -1,0 +1,25 @@
+.widget {
+  position: absolute;
+  width: 220px;
+  min-height: 120px;
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(255,255,255,.55);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0,0,0,.22);
+  resize: both;
+  overflow: auto;
+}
+.widget h3 { margin: 0 0 6px 0; font-size: 14px; }
+.widget .mini { font-size: 12px; opacity: .8; }
+.widget-handle { cursor: move; font-weight: 700; margin-bottom: 8px; }
+.finder-layout { display: grid; grid-template-columns: 170px 1fr; gap: 12px; height: 100%; }
+.finder-sidebar { border-right: 1px solid rgba(0,0,0,.12); padding-right: 8px; }
+.finder-content.grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(96px,1fr)); gap: 8px; }
+.finder-item { padding: 8px; border-radius: 10px; background: rgba(255,255,255,.45); cursor: pointer; }
+.finder-item:hover { background: rgba(120,170,255,.4); }
+.media-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 10px; }
+.thumb { height: 76px; border-radius: 10px; background: linear-gradient(135deg,#5583ff,#9ec0ff); padding: 8px; color: #fff; font-size: 12px; }
+.player-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.player-controls input[type="range"] { flex: 1; min-width: 120px; }
+.playlist li { cursor: pointer; margin-bottom: 6px; }

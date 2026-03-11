@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MacWebOS</title>
+    <link rel="stylesheet" href="css/system.css" />
+    <link rel="stylesheet" href="css/windows.css" />
+    <link rel="stylesheet" href="css/widgets.css" />
+  </head>
+  <body>
+    <div id="desktop" class="desktop light-mode">
+      <header class="menu-bar glass">
+        <div class="menu-left">
+          <button class="menu-apple" id="appleMenu"></button>
+          <span class="menu-app-name" id="activeAppName">Finder</span>
+          <button class="menu-item">File</button>
+          <button class="menu-item">Edit</button>
+          <button class="menu-item">View</button>
+          <button class="menu-item">Window</button>
+          <button class="menu-item">Help</button>
+        </div>
+        <div class="menu-right">
+          <button id="controlCenterBtn" class="menu-icon">⌘</button>
+          <button id="notificationBtn" class="menu-icon">🔔</button>
+          <span id="menuClock"></span>
+        </div>
+      </header>
+
+      <main id="desktopArea" class="desktop-area">
+        <section id="desktopIcons" class="desktop-icons"></section>
+        <section id="windowLayer" class="window-layer"></section>
+        <section id="widgetLayer" class="widget-layer"></section>
+      </main>
+
+      <aside id="controlCenter" class="side-panel glass hidden">
+        <h2>Control Center</h2>
+        <label>Brightness <input id="brightnessSlider" type="range" min="50" max="150" value="100" /></label>
+        <label>Volume <input id="volumeSlider" type="range" min="0" max="100" value="80" /></label>
+        <div class="toggle-row">
+          <button id="wifiToggle" class="toggle active">Wi‑Fi</button>
+          <button id="bluetoothToggle" class="toggle">Bluetooth</button>
+        </div>
+        <button id="themeToggle" class="toggle">Toggle Dark / Light</button>
+        <div class="quick-music" id="quickMusic">No track playing</div>
+      </aside>
+
+      <aside id="notificationCenter" class="side-panel glass hidden">
+        <div class="panel-head">
+          <h2>Notifications</h2>
+          <button id="clearNotifications">Clear all</button>
+        </div>
+        <ul id="notificationList"></ul>
+      </aside>
+
+      <ul id="desktopContextMenu" class="context-menu hidden">
+        <li data-action="new-folder">New Folder</li>
+        <li data-action="switch-wallpaper">Switch Wallpaper</li>
+        <li data-action="toggle-widget">Toggle Widgets</li>
+      </ul>
+
+      <footer id="dock" class="dock glass"></footer>
+      <div id="nowPlayingBar" class="now-playing hidden"></div>
+    </div>
+
+    <script src="js/system.js"></script>
+    <script src="js/window-manager.js"></script>
+    <script src="js/finder.js"></script>
+    <script src="js/media.js"></script>
+    <script src="js/apps.js"></script>
+    <script src="js/widgets.js"></script>
+    <script src="widgets/clock.js"></script>
+    <script src="widgets/weather.js"></script>
+    <script src="widgets/music.js"></script>
+  </body>
+</html>
