@@ -5,18 +5,24 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SpotLite Player</title>
   <style>
-    :root{--bg:#121212;--panel:#181818;--panel2:#242424;--text:#fff;--muted:#b3b3b3;--green:#1db954}
-    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
-    .app{display:grid;grid-template-columns:260px 1fr;grid-template-rows:1fr 88px;height:100vh}
-    .sidebar{background:#000;padding:12px;overflow:auto}.main{padding:14px;overflow:auto;background:linear-gradient(#2a2a2a,#121212 220px)}
-    .now{grid-column:1/3;background:var(--panel);border-top:1px solid #333;padding:10px 14px;display:grid;grid-template-columns:220px 1fr 220px;gap:12px;align-items:center}
-    input,button{border:none;border-radius:9px;padding:8px 10px} input{background:var(--panel2);color:#fff;width:100%}
-    button{background:var(--panel2);color:#fff;cursor:pointer}.primary{background:var(--green);color:#000;font-weight:700}
-    .track{padding:10px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;justify-content:space-between;cursor:pointer;margin-top:8px}
-    .track:hover{background:rgba(255,255,255,.12)}
-    .hero{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:end}.cover{height:200px;border-radius:12px;background:linear-gradient(135deg,#1db954,#125f2e);display:grid;place-items:center;font-size:42px}
-    .mini{color:var(--muted);font-size:12px}.queue{margin-top:14px}
-    canvas{width:100%;height:56px;background:#101010;border-radius:8px}
+    :root { --bg:#121212; --panel:#181818; --panel2:#242424; --text:#fff; --muted:#b3b3b3; --green:#1db954; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); }
+    .app { display:grid; grid-template-columns:260px 1fr; grid-template-rows:1fr 88px; height:100vh; }
+    .sidebar { background:#000; padding:12px; overflow:auto; }
+    .main { padding:14px; overflow:auto; background:linear-gradient(#2a2a2a,#121212 220px); }
+    .now { grid-column:1/3; background:var(--panel); border-top:1px solid #333; padding:10px 14px; display:grid; grid-template-columns:220px 1fr 220px; gap:12px; align-items:center; }
+    input,button { border:none; border-radius:9px; padding:8px 10px; }
+    input { background:var(--panel2); color:#fff; width:100%; }
+    button { background:var(--panel2); color:#fff; cursor:pointer; }
+    .primary { background:var(--green); color:#000; font-weight:700; }
+    .track { padding:10px; border-radius:10px; background:rgba(255,255,255,.04); display:flex; justify-content:space-between; cursor:pointer; margin-top:8px; }
+    .track:hover { background:rgba(255,255,255,.12); }
+    .hero { display:grid; grid-template-columns:200px 1fr; gap:14px; align-items:end; }
+    .cover { height:200px; border-radius:12px; background:linear-gradient(135deg,#1db954,#125f2e); display:grid; place-items:center; font-size:42px; }
+    .mini { color:var(--muted); font-size:12px; }
+    .queue { margin-top:14px; }
+    canvas { width:100%; height:56px; background:#101010; border-radius:8px; }
   </style>
 </head>
 <body>
@@ -24,7 +30,10 @@
   <aside class="sidebar">
     <h3>Your Library</h3>
     <input id="search" placeholder="Search songs or artists" />
-    <label style="display:block;margin-top:8px;background:var(--green);color:#000;padding:9px;border-radius:9px;text-align:center;cursor:pointer;font-weight:700;">Add Local Songs<input id="picker" type="file" accept="audio/*" multiple hidden></label>
+    <label style="display:block;margin-top:8px;background:var(--green);color:#000;padding:9px;border-radius:9px;text-align:center;cursor:pointer;font-weight:700;">
+      Add Local Songs
+      <input id="picker" type="file" accept="audio/*" multiple hidden>
+    </label>
     <div id="playlist"></div>
   </aside>
   <main class="main">
@@ -32,8 +41,8 @@
       <div class="cover">♫</div>
       <div>
         <div class="mini">ARTIST PAGE</div>
-        <h1 id="artist">Various Artists</h1>
-        <p id="song" class="mini">Choose a track from the playlist</p>
+        <h1 id="artist">Local Library</h1>
+        <p id="song" class="mini">Import local tracks to start playback.</p>
         <div style="display:flex;gap:8px">
           <button id="shuffle">Shuffle</button><button id="prev">⏮</button><button id="play" class="primary">▶</button><button id="next">⏭</button><button id="repeat">Repeat</button>
         </div>
@@ -45,7 +54,7 @@
     </section>
   </main>
   <footer class="now">
-    <div><strong id="npTitle">Nothing playing</strong><div id="npArtist" class="mini">—</div></div>
+    <div><strong id="npTitle">Nothing playing</strong><div id="npArtist" class="mini">Import local tracks</div></div>
     <div><input id="seek" type="range" min="0" max="100" value="0"><canvas id="viz" width="560" height="56"></canvas></div>
     <div><label class="mini">Volume<input id="volume" type="range" min="0" max="1" step="0.01" value="1"></label></div>
   </footer>
@@ -60,27 +69,21 @@
     seek: $('seek'), volume: $('volume'), viz: $('viz'), audio: $('audio')
   };
 
-  const starter = [
-    { title: 'Neon Nights', artist: 'Astra' },
-    { title: 'Ocean Pulse', artist: 'Lunar Bay' },
-    { title: 'Midnight Run', artist: 'Vektor' }
-  ];
-
-  let library = [...starter];
-  let queue = [...starter];
+  let library = [];
+  let queue = [];
   let index = -1;
   let repeatOn = false;
 
   function renderPlaylist(list = library) {
     el.playlist.innerHTML = list
       .map((t) => `<div class='track' data-i='${library.indexOf(t)}'><span>${t.title}</span><small>${t.artist}</small></div>`)
-      .join('');
+      .join('') || '<div class="mini" style="margin-top:8px">No songs yet. Add local files.</div>';
   }
 
   function renderQueue() {
     el.queueList.innerHTML = queue
       .map((t, i) => `<div class='track' data-q='${i}'><span>${i + 1}. ${t.title}</span><small>${t.artist}</small></div>`)
-      .join('');
+      .join('') || '<div class="mini">Queue is empty</div>';
   }
 
   function loadTrack(i) {
@@ -91,12 +94,12 @@
     el.artist.textContent = track.artist;
     el.npTitle.textContent = track.title;
     el.npArtist.textContent = track.artist;
-    if (track.url) {
-      el.audio.src = track.url;
-      el.audio.play();
-      el.play.textContent = '⏸';
-    }
+    el.audio.src = track.url;
+    el.audio.play();
+    el.play.textContent = '⏸';
   }
+
+  function hasTracks() { return library.length > 0; }
 
   el.playlist.onclick = (e) => {
     const row = e.target.closest('.track');
@@ -122,21 +125,19 @@
     queue = [...library];
     renderPlaylist();
     renderQueue();
+    if (index < 0 && hasTracks()) loadTrack(0);
   };
 
   el.play.onclick = () => {
+    if (!hasTracks()) return;
     if (index < 0) return loadTrack(0);
-    if (el.audio.paused) {
-      el.audio.play();
-      el.play.textContent = '⏸';
-    } else {
-      el.audio.pause();
-      el.play.textContent = '▶';
-    }
+    if (el.audio.paused) { el.audio.play(); el.play.textContent = '⏸'; }
+    else { el.audio.pause(); el.play.textContent = '▶'; }
   };
-  el.next.onclick = () => loadTrack((index + 1 + library.length) % library.length);
-  el.prev.onclick = () => loadTrack((index - 1 + library.length) % library.length);
-  el.shuffle.onclick = () => loadTrack(Math.floor(Math.random() * library.length));
+
+  el.next.onclick = () => { if (hasTracks()) loadTrack((index + 1 + library.length) % library.length); };
+  el.prev.onclick = () => { if (hasTracks()) loadTrack((index - 1 + library.length) % library.length); };
+  el.shuffle.onclick = () => { if (hasTracks()) loadTrack(Math.floor(Math.random() * library.length)); };
   el.repeat.onclick = () => {
     repeatOn = !repeatOn;
     el.repeat.style.background = repeatOn ? '#1db954' : '#242424';
@@ -149,15 +150,14 @@
   el.seek.oninput = () => {
     if (el.audio.duration) el.audio.currentTime = (Number(el.seek.value) / 100) * el.audio.duration;
   };
-  el.volume.oninput = () => {
-    el.audio.volume = Number(el.volume.value);
-  };
+  el.volume.oninput = () => { el.audio.volume = Number(el.volume.value); };
 
   const ctx = el.viz.getContext('2d');
   function drawViz() {
     ctx.clearRect(0, 0, el.viz.width, el.viz.height);
+    const active = !el.audio.paused;
     for (let i = 0; i < 38; i++) {
-      const h = 6 + Math.random() * 45;
+      const h = active ? 6 + Math.random() * 45 : 8;
       ctx.fillStyle = '#1db954';
       ctx.fillRect(i * 15, 56 - h, 9, h);
     }

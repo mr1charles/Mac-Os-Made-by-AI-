@@ -75,7 +75,10 @@
     const stored = localStorage.getItem(`macwebos.window.${id}`);
     if (stored) {
       const pos = JSON.parse(stored);
-      Object.assign(win.style, pos);
+      if (pos.top) win.style.top = pos.top;
+      if (pos.left) win.style.left = pos.left;
+      if (pos.width) win.style.width = pos.width;
+      if (pos.height) win.style.height = pos.height;
       if (pos.maximized) win.classList.add('maximized');
     }
 
