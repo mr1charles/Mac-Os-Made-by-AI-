@@ -1,15 +1,15 @@
 (() => {
   const dock = document.getElementById('dock');
   const icons = document.getElementById('desktopIcons');
+  const registry = window.MacWebOSAppRegistry || {};
   const appDefs = [
-    { id: 'finder', label: 'Finder', icon: '📁', multi: true, title: 'Finder', src: 'apps/finder.html' },
+    registry.finder,
     { id: 'browser', label: 'Browser', icon: '🌐', multi: true, title: 'Browser', src: 'apps/browser.html' },
-    { id: 'mp4', label: 'MP4 Player', icon: '🎬', multi: true, title: 'VideoHub', src: 'apps/mp4-player.html' },
-    { id: 'mp3', label: 'MP3 Player', icon: '🎵', multi: true, title: 'SpotLite', src: 'apps/mp3-player.html' }
-  ];
+    registry.mp4,
+    registry.mp3
+  ].filter(Boolean);
   const running = new Set();
-
-  const appMap = new Map(appDefs.map((a) => [a.id, a]));
+  const appMap = new Map(appDefs.map((app) => [app.id, app]));
 
   function openById(appId) {
     const app = appMap.get(appId);
@@ -22,7 +22,9 @@
   function setRunning(id, on) {
     if (on) running.add(id);
     else running.delete(id);
-    dock.querySelectorAll('.dock-app').forEach((btn) => btn.classList.toggle('running', running.has(btn.dataset.id)));
+    dock.querySelectorAll('.dock-app').forEach((btn) => {
+      btn.classList.toggle('running', running.has(btn.dataset.id));
+    });
   }
 
   appDefs.forEach((app) => {
@@ -63,7 +65,14 @@
     folder.className = 'desktop-icon';
     folder.innerHTML = '<div style="font-size:40px">📂</div><div>New Folder</div>';
     folder.draggable = true;
-    folder.ondblclick = () => WindowManager.openApp({ id: folderId, multi: true, title: 'Folder', content: '<div>Empty folder</div>', width: 420, height: 280 });
+    folder.ondblclick = () => WindowManager.openApp({
+      id: folderId,
+      multi: true,
+      title: 'Folder',
+      content: '<div>Empty folder</div>',
+      width: 420,
+      height: 280
+    });
     icons.append(folder);
     MacWebOS.notify('New folder created');
   }

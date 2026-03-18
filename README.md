@@ -21,8 +21,8 @@ A browser-based desktop operating system inspired by macOS. Everything runs as s
   - window-manager.js
   - widgets.js
   - apps.js
-  - finder.js
-  - media.js
+  - finder.js (Finder app registry)
+  - media.js (media app registry)
 - /apps
   - mp4-player.html
   - mp3-player.html
@@ -41,7 +41,7 @@ A browser-based desktop operating system inspired by macOS. Everything runs as s
 ## Included features
 
 - macOS-style menu bar, dock, windows, and desktop icons
-- Finder-style file manager
+- Finder-style file manager launched from a shared app registry
 - YouTube-themed MP4 app with search, categories, local uploads, drag/drop, seek/speed/volume/fullscreen controls
 - Spotify-themed MP3 app with playlist search, queue, shuffle/repeat, local track imports, visualizer, and now-playing bar
 - Draggable/resizable widgets with saved positions
