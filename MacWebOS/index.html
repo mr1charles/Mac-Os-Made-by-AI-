@@ -9,11 +9,18 @@
     <link rel="stylesheet" href="css/widgets.css" />
   </head>
   <body>
+    <div id="bootScreen" class="boot-screen">
+      <div class="boot-logo"></div>
+      <div class="boot-progress"><span id="bootBar"></span></div>
+      <p>Booting MacWebOS...</p>
+    </div>
+
     <div id="desktop" class="desktop light-mode">
       <header class="menu-bar glass">
         <div class="menu-left">
           <button class="menu-apple" id="appleMenu"></button>
           <span class="menu-app-name" id="activeAppName">Finder</span>
+          <button class="menu-item" id="missionControlBtn">Mission Control</button>
           <button class="menu-item">File</button>
           <button class="menu-item">Edit</button>
           <button class="menu-item">View</button>
@@ -55,10 +62,17 @@
 
       <ul id="desktopContextMenu" class="context-menu hidden">
         <li data-action="new-folder">New Folder</li>
+        <li data-action="new-smart-folder">New Smart Folder</li>
         <li data-action="switch-wallpaper">Switch Wallpaper</li>
         <li data-action="toggle-widget">Toggle Widgets</li>
       </ul>
 
+      <section id="missionControl" class="mission-control hidden">
+        <h2>Mission Control</h2>
+        <div id="missionGrid" class="mission-grid"></div>
+      </section>
+
+      <section id="toastLayer" class="toast-layer"></section>
       <footer id="dock" class="dock glass"></footer>
       <div id="nowPlayingBar" class="now-playing hidden"></div>
     </div>
